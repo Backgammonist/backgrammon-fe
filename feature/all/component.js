@@ -1,37 +1,60 @@
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
 import Link from 'next/link'
+import { ListLi } from './style'
 
-const MatchListItem = ({
-    id = '123',
-    userAvatar = 'https://placehold.it/30x30',
-    locationName = 'The Hand and Flower Pub',
-    timedate = '4:30 pm today',
-    poterntialOppCount = 3
-}) => <li><Link href="/match/[id]" as={`/match/${id}`}>
-    <a>
-    <img src={userAvatar}/>
-    <span>{locationName}</span>
-    <span>{timedate}</span>
-    <span>{poterntialOppCount}</span>
-    </a></Link>
-    
-</li>
+import fetch from 'isomorphic-unfetch'
+import { addToMatches } from '../new/action'
+
+const addMatch =async (location, date) => {
+
+  const query = JSON.stringify({
+    query: `mutation {
+      addMatch(input: {
+        location: "${location}"
+        date: "${location}"
+      }) {
+        location
+        
+      }
+    }`
+  });
+
+  const response = await fetch('http://localhost:3000/api/graphql', {
+    headers: {'content-type': 'application/json'},
+    method: 'POST',
+    body: query,
+  });
+  
+  const responseJson = await response.json();
+  return responseJson.data;
+}
+
+const MatchListItem = ({ location, date, _id }) => (<ListLi>
+  <Link href="/match/[id]" as={`/match/${_id}`}>
+  <a>
+    <span>{location}</span>
+    <span>{date}</span>
+  </a>
+  </Link>
+  </ListLi>)
+
 
 const All = ({ matches }) => {
-    console.log(matches);
-    
-    return <div>
-        <ul>
-            {matches.map(match=> <MatchListItem locationName={match.where} timedate={match.when}/>)}
-           
-        </ul>
+  const [locationData, updateLocationData] = React.useState('');
+  const [dateData, updateDateData] = React.useState('');
+  
+  return <div>
+    <ul className="list pl0 mt0 measure center">
+      {matches.map(match => <MatchListItem {...match} />)}
+    </ul>
+    <div>
+      <form onSubmit={(e) => {e.preventDefault(); addMatch(locationData, dateData)}}>
+        <input value={dateData} onChange={(e) => updateDateData(e.target.value)} />
+        <input value={locationData} onChange={(e) => updateLocationData(e.target.value)}/>
+        <input type="submit" value="set" />
+      </form>
     </div>
+  </div>
 
 }
 
-const mapStateToProps = (state) => ({
-    matches: state.matches
-})
-
-export default connect(mapStateToProps)(All)
+export default All
