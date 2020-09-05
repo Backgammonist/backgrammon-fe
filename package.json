@@ -18,7 +18,7 @@
     "express": "^4.17.1",
     "graphql": "^14.5.7",
     "graphql-server-express": "^1.4.1",
-    "graphql-tools": "^4.0.5",
+    "graphql-tools": "^6.2.1",
     "isomorphic-unfetch": "^3.0.0",
     "mongodb": "^3.3.2",
     "next": "^9.0.6",
